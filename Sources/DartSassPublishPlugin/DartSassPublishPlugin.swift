@@ -19,7 +19,7 @@ public extension Plugin {
             try await compiler.compileSassFiles(
                 from: originDir,
                 to: destinationDir,
-                context: context
+                fileManager: context
             )
         }
     }
