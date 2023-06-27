@@ -11,13 +11,15 @@ import Foundation
 final class FileMock: File {
     let url: URL
     let nameExcludingExtension: String
+    let `extension`: String?
 
     var writeCallCount = 0
     var writeParams = [String]()
 
-    init(url: URL, nameExcludingExtension: String) {
+    init(url: URL, nameExcludingExtension: String, `extension`: String?) {
         self.url = url
         self.nameExcludingExtension = nameExcludingExtension
+        self.`extension` = `extension`
     }
 
     func write(_ string: String, encoding: String.Encoding) throws {

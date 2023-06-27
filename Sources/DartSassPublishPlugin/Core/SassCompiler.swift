@@ -20,6 +20,11 @@ protocol SassCompiler {
 }
 
 final class SassCompilerImpl: SassCompiler {
+    private enum Constants {
+        static let sassExtensions = Set(["scss", "sass"])
+        static let cssExtnsion = "css"
+    }
+
     private let engine: SassCompilerEngine
 
     init(engine: SassCompilerEngine) {
@@ -42,8 +47,11 @@ final class SassCompilerImpl: SassCompiler {
         let destinationDir = try context.createDirectory(at: destinationPath)
 
         for file in files {
+            guard let ext = file.extension, Constants.sassExtensions.contains(ext) else {
+                continue
+            }
             let css = try await engine.compile(fileAt: file.url)
-            let resultFile = try destinationDir.createFile(at: file.nameExcludingExtension + ".css")
+            let resultFile = try destinationDir.createFile(at: "\(file.nameExcludingExtension).\(Constants.cssExtnsion)")
             try resultFile.write(css, encoding: .utf8)
         }
     }

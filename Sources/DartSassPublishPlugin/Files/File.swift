@@ -16,6 +16,9 @@ protocol File {
     /// The name of this file without its extension
     var nameExcludingExtension: String { get }
 
+    /// The extension of this file
+    var `extension`: String? { get }
+
     /// Writes a string to this file
     ///
     /// - Parameters:

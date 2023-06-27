@@ -45,8 +45,8 @@ final class SassCompilerTests: XCTestCase {
     func test_compileSassFiles_whenDirectoryIsNotEmpty_compilesAndCreateFiles() async throws {
         // Arrange
         let files: [FileMock] = [
-            FileMock(url: URL(string: "/some/path/file1.sass")!, nameExcludingExtension: "file1"),
-            FileMock(url: URL(string: "/some/path/file2.scss")!, nameExcludingExtension: "file2")
+            FileMock(url: URL(string: "/some/path/file1.sass")!, nameExcludingExtension: "file1", extension: "sass"),
+            FileMock(url: URL(string: "/some/path/file2.scss")!, nameExcludingExtension: "file2", extension: "scss")
         ]
         context.directoryAtPathValue = DirectoryMock(files: files)
 
@@ -78,6 +78,45 @@ final class SassCompilerTests: XCTestCase {
         // Assert: CSS was written to destination files
         XCTAssertEqual(destinationFile.writeCallCount, 2)
         XCTAssertEqual(destinationFile.writeParams, [engine.compileFileValue, engine.compileFileValue])
+    }
+
+    func test_compileSassFiles_whenDirectoryContainsNonSassFiles_compilesSassFilesOnly() async throws {
+        // Arrange
+        let files: [FileMock] = [
+            FileMock(url: URL(string: "/some/path/file1.sass")!, nameExcludingExtension: "file1", extension: "sass"),
+            FileMock(url: URL(string: "/some/path/file2.txt")!, nameExcludingExtension: "file2", extension: "txt"),
+            FileMock(url: URL(string: "/some/path/file3")!, nameExcludingExtension: "file3", extension: nil)
+        ]
+        context.directoryAtPathValue = DirectoryMock(files: files)
+
+        engine.compileFileValue = "body { background-color: blue; }"
+
+        let destinationDir = DirectoryMock(files: [])
+        let destinationFile = files[0]
+        destinationDir.createFileAtPathValue = destinationFile
+        context.createDirectoryAtPathValue = destinationDir
+
+        // Act: compile files
+        try! await compiler.compileSassFiles(from: "/origin/path", to: "/destination/path", context: context)
+
+        // Assert: get origin directory was called properly
+        XCTAssertEqual(context.directoryAtPathCallCount, 1)
+
+        // Assert: compile files was called properly
+        XCTAssertEqual(engine.compileFileCallCount, 1)
+        XCTAssertEqual(engine.compileFileParams, [files[0].url])
+
+        // Assert: destination directory was created
+        XCTAssertEqual(context.createDirectoryAtPathCallCount, 1)
+        XCTAssertEqual(context.createDirectoryAtPathParams, ["/destination/path"])
+
+        // Assert: destination files were created
+        XCTAssertEqual(destinationDir.createFileAtPathCallCount, 1)
+        XCTAssertEqual(destinationDir.createFileAtPathParams, ["file1.css"])
+
+        // Assert: CSS was written to destination files
+        XCTAssertEqual(destinationFile.writeCallCount, 1)
+        XCTAssertEqual(destinationFile.writeParams, [engine.compileFileValue])
     }
 
     func test_deinit_shutsdownInternalCompiler() {
