@@ -40,8 +40,7 @@ final class SassCompilerImpl: SassCompiler {
 
         let files = originDir.files()
         guard !files.isEmpty else {
-            // TODO: throw an error
-            return
+            throw SassCompilerError.emptyDirectory
         }
 
         let destinationDir = try context.createDirectory(at: destinationPath)

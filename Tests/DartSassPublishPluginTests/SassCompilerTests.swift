@@ -35,7 +35,16 @@ final class SassCompilerTests: XCTestCase {
         context.directoryAtPathValue = DirectoryMock(files: [])
 
         // Act: compile files
-        try! await compiler.compileSassFiles(from: "/origin/path", to: "/destination/path", context: context)
+        do {
+            try await compiler.compileSassFiles(from: "/origin/path", to: "/destination/path", context: context)
+            XCTFail("Compiling should fail")
+        } catch {
+            guard let sassCompilerError = error as? SassCompilerError else {
+                XCTFail("Not a SassCompilerError")
+                return
+            }
+            XCTAssertEqual(sassCompilerError, .emptyDirectory)
+        }
 
         // Assert: destination directory was not created
         XCTAssertEqual(context.directoryAtPathCallCount, 1)
