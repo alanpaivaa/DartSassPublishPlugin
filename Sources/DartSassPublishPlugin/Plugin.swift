@@ -14,12 +14,12 @@ public extension Plugin {
     ///     - destinationDir: directory where the resulting CSS files will be written to
     static func compileSass(from originDir: Path, to destinationDir: Path) -> Self {
         Plugin(name: "DartSass") { context in
-            let factory = PublishSassCompilerFactory()
+            let factory = SassCompilerFactory()
             let compiler = try factory.make()
             try await compiler.compileSassFiles(
                 from: originDir,
                 to: destinationDir,
-                fileManager: context
+                context: context
             )
         }
     }

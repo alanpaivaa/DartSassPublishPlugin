@@ -10,17 +10,17 @@ import Foundation
 
 /// Defines an API to interact with system directories
 protocol Directory {
-    /// The immediate files contained in this directory
-    var allFiles: [File] { get }
-
     /// Creates a file
     ///
     /// - Parameter path: path to create the file at
     func createFile(at path: String) throws -> File
+
+    /// The immediate files contained in this directory
+    func files() -> [File]
 }
 
 extension Folder: Directory {
-    var allFiles: [File] {
+    func files() -> [File] {
         return files.map { $0 }
     }
 

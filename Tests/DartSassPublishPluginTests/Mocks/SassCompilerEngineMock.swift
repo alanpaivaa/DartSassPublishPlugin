@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  SassCompilerEngineMock.swift
 //  
 //
 //  Created by Alan Paiva on 6/26/23.
@@ -8,7 +8,7 @@
 import Foundation
 @testable import DartSassPublishPlugin
 
-final class DartSassCompilerMock: DartSassCompiler {
+final class SassCompilerEngineMock: SassCompilerEngine {
     var compileFileValue: String?
     var compileFileCallCount = 0
     var compileFileParams = [URL]()

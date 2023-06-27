@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  Context.swift
 //  
 //
 //  Created by Alan Paiva on 6/26/23.
@@ -9,7 +9,7 @@ import Foundation
 import Publish
 @testable import DartSassPublishPlugin
 
-final class CompilerFileManagerMock: CompilerFileManager {
+final class ContextMock: Context {
     var createDirectoryAtPathValue: Directory?
     var createDirectoryAtPathCallCount = 0
     var createDirectoryAtPathParams = [Path]()

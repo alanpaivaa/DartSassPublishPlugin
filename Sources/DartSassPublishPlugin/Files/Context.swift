@@ -8,8 +8,8 @@
 import Foundation
 import Publish
 
-/// Implementers should be able to perform file operations such as creating directories
-protocol CompilerFileManager {
+/// Implementers should be able to perform operations such as creating directories
+protocol Context {
     /// Creates a directory. If the directory already exists, should be no-op.
     ///
     /// - Parameter path: path where the directory will be created
@@ -22,7 +22,7 @@ protocol CompilerFileManager {
     func directory(at path: Path) throws -> Directory
 }
 
-extension PublishingContext: CompilerFileManager {
+extension PublishingContext: Context {
     func createDirectory(at path: Path) throws -> Directory {
         try createFolder(at: path)
     }
