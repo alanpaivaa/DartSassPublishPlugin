@@ -128,6 +128,46 @@ final class SassCompilerTests: XCTestCase {
         XCTAssertEqual(destinationFile.writeParams, [engine.compileFileValue])
     }
 
+    func test_compileSassFiles_whenThereArePartials_compilesNonPartialSassFilesOnly() async throws {
+        // Arrange
+        let files: [FileMock] = [
+            FileMock(url: URL(string: "/some/path/file1.scss")!, nameExcludingExtension: "file1", extension: "scss"),
+            FileMock(url: URL(string: "/some/path/_file2.scss")!, nameExcludingExtension: "_file2", extension: "scss"),
+            FileMock(url: URL(string: "/some/path/_file3.scss")!, nameExcludingExtension: "_file3", extension: "scss")
+        ]
+        context.directoryAtPathValue = DirectoryMock(files: files)
+
+        engine.compileFileValue = "body { background-color: blue; }"
+
+        let destinationDir = DirectoryMock(files: [])
+        let destinationFile = files[0]
+        destinationDir.createFileAtPathValue = destinationFile
+        context.createDirectoryAtPathValue = destinationDir
+
+        // Act: compile files
+        try! await compiler.compileSassFiles(from: "/origin/path", to: "/destination/path", context: context)
+
+        // Assert: get origin directory was called properly
+        XCTAssertEqual(context.directoryAtPathCallCount, 1)
+
+        // Assert: compile files was called properly
+        XCTAssertEqual(engine.compileFileCallCount, 1)
+        XCTAssertEqual(engine.compileFileParams, [files[0].url])
+
+        // Assert: destination directory was created
+        XCTAssertEqual(context.createDirectoryAtPathCallCount, 1)
+        XCTAssertEqual(context.createDirectoryAtPathParams, ["/destination/path"])
+
+        // Assert: destination files were created
+        XCTAssertEqual(destinationDir.createFileAtPathCallCount, 1)
+        XCTAssertEqual(destinationDir.createFileAtPathParams, ["file1.css"])
+
+        // Assert: CSS was written to destination files
+        XCTAssertEqual(destinationFile.writeCallCount, 1)
+        XCTAssertEqual(destinationFile.writeParams, [engine.compileFileValue])
+    }
+
+
     func test_deinit_shutsdownInternalCompiler() {
         // Act: deinitialize compiler
         compiler = nil

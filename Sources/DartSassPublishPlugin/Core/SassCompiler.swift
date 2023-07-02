@@ -46,9 +46,16 @@ final class SassCompilerImpl: SassCompiler {
         let destinationDir = try context.createDirectory(at: destinationPath)
 
         for file in files {
-            guard let ext = file.extension, Constants.sassExtensions.contains(ext) else {
+            guard let ext = file.extension else {
                 continue
             }
+
+            let isSassFile = Constants.sassExtensions.contains(ext)
+            let isPartial = file.nameExcludingExtension.starts(with: "_")
+            guard isSassFile && !isPartial else {
+                continue
+            }
+
             let css = try await engine.compile(fileAt: file.url)
             let resultFile = try destinationDir.createFile(at: "\(file.nameExcludingExtension).\(Constants.cssExtnsion)")
             try resultFile.write(css, encoding: .utf8)
